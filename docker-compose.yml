@@ -1,0 +1,33 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: sipe_db
+      MYSQL_USER: sipe_user
+      MYSQL_PASSWORD: sipe_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build: ./backend
+    command: python sipe/manage.py runserver 0.0.0.0:8000
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    environment:
+      DB_NAME: sipe_db
+      DB_USER: sipe_user
+      DB_PASS: sipe_pass
+      DB_HOST: mysql
+    depends_on:
+      - mysql
+
+volumes:
+  db_data:
